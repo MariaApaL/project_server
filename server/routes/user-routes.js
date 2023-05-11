@@ -32,6 +32,7 @@ module.exports = function(app) {
 
   // ruta PUT para actualizar un usuario
 
+  // upload.single('file'),
   app.put("/updateUser/:id", controller.updateUser);
 
   // ruta DELETE para eliminar un usuario
@@ -45,5 +46,17 @@ module.exports = function(app) {
   // ruta GET para obtener un usuario por su nombre o email
 
   app.get("/getUser", controller.getUser);
+
+  // ruta GET para obtener un usuario por su id
+  app.get("/getUserById/:id", controller.getUserById);
+
+  //Agregar a favoritos.
+  app.post('/setFavorite/:id', controller.setFavorite);
+  //Obtener favoritos.
+  app.get("/getFavorites/:id", controller.getFavorites);
+  //Eliminar de favoritos.
+  app.delete("/deleteFavorite/:id", controller.deleteFavorite);
+
+
 
 };
