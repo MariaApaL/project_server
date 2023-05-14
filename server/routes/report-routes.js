@@ -13,4 +13,14 @@ module.exports = function(app) {
   app.get("/getReports", controller.getReports);
 
 
+ //agregar reporte 
+
+ app.post("/addReport/:id", controller.addReport);
+
+ //obtener reportes por tipo
+ app.get("/getReportsByType/:id", controller.getReportsByType);
+
+//borrar por id de eventos:
+app.delete("/deleteReportsByEventId/:id", controller.deleteReportsByEventId);
+ 
 }

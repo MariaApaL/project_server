@@ -63,7 +63,32 @@ const userSchema = new mongoose.Schema({
             min: 1,
             max: 5
         }
-    ]
+    ],
+    reports: [
+        {
+            report:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Report"
+
+            },
+            created: {
+                
+                    type: Date,
+                    default: Date.now
+                },
+            eventId:{
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Event"
+            },
+            userId:{
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+            
+        
+        },
+        
+    ],
 }, {
     timestamps: true
 });
