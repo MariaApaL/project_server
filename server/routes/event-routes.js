@@ -1,4 +1,4 @@
-const { verifyEvent } = require("../middlewares");
+const { verifyEvent, upload } = require("../middlewares");
 const controller = require("../controllers/event-controller");
 
 module.exports = function (app) {
@@ -24,6 +24,9 @@ module.exports = function (app) {
     controller.createEvent
   );
 
+  app.post('/uploadEventPhoto/:id', upload.single('picture') , controller.uploadEventPhoto);
+
+  
   // Ruta get para obtener todos los eventos de la base de datos
 
   app.get("/getEvents", controller.getEvents);
@@ -31,7 +34,9 @@ module.exports = function (app) {
   // Ruta get para obtener un evento por su id 
   app.get("/getEvent/:id", controller.getEvent);
 
-  // ruta POST para actualizar un event
+  // ruta PUT para actualizar un event
+
+
 
   app.put("/updateEvent/:id", controller.updateEvent);
 
@@ -78,17 +83,14 @@ module.exports = function (app) {
 
   app.delete("/deleteUserPlazas/:id", controller.deleteUserPlazas);
 
-  //COMMENTS
 
-  app.post('/addComments/', controller.addComments);
+ //VALORACIONES
+ app.post("/addValuation/:id", controller.addValuation);
 
-  app.get("/getComments/:id", controller.getComments);
+ app.get("/getEventValuations/:id", controller.getEventValuations);
 
-  app.delete("/deleteComment/", controller.deleteComment);
-
-  app.delete("/deleteUserComments/:id", controller.deleteUserComments);
-
+ app.get("/getEventValuationsByAuthor/:eventId/:authorId", controller.getEventValuationsByAuthor);
  
-
+app.delete("/deleteUserValuations/:id", controller.deleteUserValuations);
 
 };

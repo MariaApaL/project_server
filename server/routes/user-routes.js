@@ -1,4 +1,5 @@
 const { verifySignUp, authJwt } = require("../middlewares");
+const  { upload } = require("../middlewares");
 const controller = require("../controllers/user-controller");
 
 module.exports = function(app) {
@@ -35,6 +36,8 @@ module.exports = function(app) {
   // upload.single('file'),
   app.put("/updateUser/:id", controller.updateUser);
 
+
+  app.post("/uploadUserPhoto/:id", upload.single('picture'), controller.uploadUserPhoto);
   // ruta DELETE para eliminar un usuario
 
   app.delete("/deleteUser", controller.deleteUser);

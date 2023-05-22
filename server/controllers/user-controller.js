@@ -1,9 +1,9 @@
 const config = require("../config/auth-config");
 const badWords = require("../config/badword")
 const db = require("../models");
+const cloudinary = require("../config/cloudinary");
 const User = db.user;
 const Role = db.role;
-const Report = db.report;
 const Event = db.event;
 
 let jwt = require("jsonwebtoken");
@@ -154,19 +154,20 @@ exports.updateUser = async (req, res) => {
 
     const fieldsToUpdate = {};
     for (const field in req.body) {
-      console.log("field:", field);
+      
       if (req.body.hasOwnProperty(field)) {
-        console.log(req.body.hasOwnProperty(field));
+        
         fieldsToUpdate[field] = req.body[field];
     }
     }
 
+    
     //console.log(fieldsToUpdate);
     const upUser = fieldsToUpdate.hasOwnProperty("user") ? fieldsToUpdate.user.toLowerCase() : null;
     
     const upEmail = fieldsToUpdate.hasOwnProperty("email") ? fieldsToUpdate.email.toLowerCase() : null;
     const upName = fieldsToUpdate.hasOwnProperty("name") ? fieldsToUpdate.name.toLowerCase() : null;
-   console.log(upName);
+  
     const upBio = fieldsToUpdate.hasOwnProperty("bio") ? fieldsToUpdate.bio.toLowerCase() : null;
 
     //comprobamos que el nuevo nombre de usuario o el nuevo email no esten en uso
@@ -192,6 +193,30 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+//Actualiza la foto de un usuario
+exports.uploadUserPhoto = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const picture = req.file.filename;
+
+    // Subir la imagen a Cloudinary utilizando una promesa
+    const uploadResult = await new Promise((resolve, reject) => {
+      cloudinary.uploader.upload(req.file.path, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result.secure_url);
+        }
+      });
+    });
+
+    // Actualizar el evento con la URL de la imagen subida a Cloudinary
+    const user = await User.findByIdAndUpdate(userId, { picture: uploadResult }, { new: true });
+    res.status(200).json({ message: 'Imagen subida correctamente', user});
+  } catch (err) {
+    res.status(500).send({ message: "Error al actualizar la imagen de usuario", error: err });
+  }
+};
 
 
 //Elimina a un usuario por su id
@@ -229,7 +254,7 @@ exports.getUserByEventId = async (req, res) => {
 
     const { id } = req.params;
     const event = await Event.findById(id);
-    console.log(event)
+   
     if (!event) {
       return res.status(404).json({ error: 'El evento no existe' });
     }
@@ -309,78 +334,6 @@ exports.deleteFavorite = async (req, res) => {
     }
   }
 
-
-
-
-
-// exports.addValuation = async (req, res) => {
-//   const id = req.params.id;
-//   const valuation = req.body.valuation;
-//   const userId = req.body.userId;
-//   const now = new Date();
-
-//   try {
-//     const event = await Event.findById(id);
-
-//     // Comprobar si la fecha actual es posterior a la creación del evento
-//     if (now < event.createdAt) {
-//       return res.status(400).json({ message: 'No se puede añadir una valoración antes de la fecha de creación del evento.' });
-//     }
-
-//     // Comprobamos que el usuario ha asistido al evento
-//     if (!event.plazas.includes(userId)) {
-//       return res.status(403).json({ message: 'El autor del comentario no ha asistido al evento' });
-//     }
-//     event.valuations.push(valuation);
-//     await event.save();
-
-//     res.status(200).json({ message: 'Valoración añadida correctamente.' });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error al añadir valoracion' });
-//   }
-// }
-
-// exports.getValuationsByUser = async (req, res, next) => {
-//   try {
-//     const events = await Event.find({ author: req.params.id }).populate('valuations');
-//     const valuations = events.reduce((acc, event) => {
-//       acc.push(...event.valuations);
-//       return acc;
-//     }, []);
-//     res.status(200).json(valuations);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-// exports.updateUserImg = async (req, res) => {
-//     try{
-
-//       const userId = req.params.id;
-
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).send({ message: "Usuario no encontrado" });
-    
-//     }
-//      const picture = req.body.picture;
-//       const updatedUser = {
-//       picture: picture
-//     };
-
-
-//     const newUser = await User.findByIdAndUpdate(userId, updatedUser, { new: true });
-//     if (!newUser) {
-//       return res.status(404).send({ message: "Usuario no encontrado" });
-//     }
-
-//     res.send({ message: "Usuario actualizado con éxito", user });
-
-
-
-//     }catch(err){
-//         res.status(500).json({ message: err.message });
-//     }
-// };
 
 
 
