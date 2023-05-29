@@ -48,28 +48,9 @@ module.exports = function (app) {
 
   app.delete("/deleteEventsByAuthor/:id", controller.deleteEventsByAuthor);
 
-
-  // ruta GET para obtener evento por category
-
-  app.get("/getEventCategory/:category", controller.getEventCategory);
-
-  // ruta GET para obtener eventos por fecha
-
-  app.get("/getEventDate", controller.getEventDate);
-
-  //ruta GET para obtener eventos por lugar
-
-  app.get("/getEventPlace", controller.getEventPlace);
-
   //ruta GET para obtener eventos por autor
   app.get("/findEventsByAuthorId/:id", controller.findEventsByAuthorId);
 
-  //ruta GET para obtener eventos según palabras buscadas en nombre o descripcion
-  app.get("/getEventWords", controller.getEventWords);
-
-  //ruta GET para obtener eventos según precio
-
-  app.get("/getEventPrice", controller.getEventPrice);
 
   //PLAZAS
 
@@ -86,10 +67,12 @@ module.exports = function (app) {
 
  //VALORACIONES
  app.post("/addValuation/:id", controller.addValuation);
-
+//Obtener valoraciones de un evento
  app.get("/getEventValuations/:id", controller.getEventValuations);
-
+//Obtener valoraciones de un evento de un usuario
  app.get("/getEventValuationsByAuthor/:eventId/:authorId", controller.getEventValuationsByAuthor);
+ //Obtener valoraciones de un usuario (las que le han puesto a sus eventos)
+ app.get("/getValuationsByAuthor/:authorId", controller.getValuationsByAuthor);
  
 app.delete("/deleteUserValuations/:id", controller.deleteUserValuations);
 

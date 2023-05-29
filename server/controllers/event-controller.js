@@ -72,14 +72,15 @@ exports.createEvent = async (req, res) => {
       price: price,
     });
 
+  
     if (category) {
-     
       const categoryObject = await Category.findOne({ type: category });
-      
+
       if (categoryObject) {
         newEvent.category = categoryObject._id;
       }
     }
+
 
     await newEvent.save();
 
@@ -92,7 +93,7 @@ exports.createEvent = async (req, res) => {
 exports.uploadEventPhoto = async (req, res) => {
   try {
     const eventId = req.params.id;
-    const picture = req.file.filename;
+   
 
     // Subir la imagen a Cloudinary utilizando una promesa
     const uploadResult = await new Promise((resolve, reject) => {
@@ -224,26 +225,6 @@ exports.deleteEventByNameAndAuthor = async (req, res) => {
   }
 };
 
-exports.getEventCategory = async (req, res) => {
-  const { category } = req.params;
-
-
-  try {
-    const foundCategory = await Category.findOne({ type: category });
-
-    if (!foundCategory) {
-      return res.status(404).json({ message: 'Categoría no encontrada' });
-    }
-
-    const categoryId = foundCategory._id;
-
-    const foundEvents = await Event.find({ categories: categoryId });
-
-    return res.status(200).json(foundEvents);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
 
 exports.findEventsByAuthorId = async (req, res) => {
   // const { author } = req.params.id;
@@ -275,63 +256,6 @@ exports.getEventsByParticipantId = async (req, res) => {
 };
 
 
-
-exports.getEventDate = async (req, res) => {
-  const { date } = req.body;
-
-  try {
-    // Convertir la fecha a formato Date
-    const newDate = moment(date, "DD-MM-YYYY").toDate();
-    
-
-    const foundEvents = await Event.find({ date: newDate });
-
-    return res.status(200).json(foundEvents);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getEventPlace = async (req, res) => {
-  const { location } = req.body;
-
-  try {
-    const foundEvents = await Event.find({ location: location });
-
-    return res.status(200).json(foundEvents);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-
-exports.getEventWords = async (req, res) => {
-
-  //Usa el query  para buscar en el nombre y la descripción , ya que son muchas palabras
-  const { words } = req.query;
-  const regex = new RegExp(words.split(' ').join('|'), 'i');
-  const events = await Event.find({
-    $or: [
-      { name: { $regex: regex } },
-      { description: { $regex: regex } },
-    ],
-  });
-  res.json(events);
-};
-
-exports.getEventPrice = async (req, res) => {
-
-  const { price } = req.body;
-
-  try {
-    const foundEvents = await Event.find({ price: price });
-
-    return res.status(200).json(foundEvents);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-
-};
 
 exports.addParticipant = async (req, res) => {
   try {
@@ -539,3 +463,18 @@ exports.getEventValuationsByAuthor = async (req, res) => {
   }
 };
 
+exports.getValuationsByAuthor = async (req, res) => {
+  try {
+    const authorId = req.params.authorId;
+    
+    // Busca todos los eventos del autor
+    const events = await Event.find({ author: authorId });
+    
+    // Obtiene todas las valoraciones de los eventos del autor
+    const valuations = events.flatMap(event => event.valuations);
+    
+    res.send({ valuations });
+  } catch (err) {
+    res.status(500).send({ message: "Error al obtener las valoraciones del autor", error: err });
+  }
+};
